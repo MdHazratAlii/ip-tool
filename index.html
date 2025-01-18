@@ -26,7 +26,7 @@
             text-align: center;
             color: #118B50;
         }
-        #ip-info {
+        .info-box {
             padding: 15px;
             margin-bottom: 20px;
             background: #E6F7F1;
@@ -45,13 +45,16 @@
         #address {
             font-weight: bold;
             color: #555;
+                text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>My Location & IP Address</h1>
-        <div id="ip-info">
+        
+        <!-- IP Info Section -->
+        <div class="info-box" id="ip-info">
             <h2>Your IP Details</h2>
             <p><strong>IP Address:</strong> <span id="ip-address">Loading...</span></p>
             <p><strong>Location:</strong> <span id="ip-location">Loading...</span></p>
@@ -62,9 +65,16 @@
             <p><strong>Longitude:</strong> <span id="longitude">Loading...</span></p>
             <p><strong>Latitude:</strong> <span id="latitude">Loading...</span></p>
         </div>
+        
+        <!-- GPS-based Address Section -->
+        <div class="info-box">
+            <h2>Your GPS-based Address:</h2>
+            <p id="address">Fetching address...</p>
+        </div>
+
+        <!-- Map Container -->
         <div class="map-container" id="map"></div>
-        <h2>Your GPS-based Address:</h2>
-        <p id="address">Fetching address...</p>
+        
         <p class="tip"><strong>Tip:</strong> Drag the marker to fine-tune your location.</p>
     </div>
 
