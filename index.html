@@ -26,7 +26,7 @@
             text-align: center;
             color: #118B50;
         }
-        #ip-info, #gps-info {
+        #ip-info {
             padding: 15px;
             margin-bottom: 20px;
             background: #E6F7F1;
@@ -46,36 +46,25 @@
             font-weight: bold;
             color: #555;
         }
-        p {
-            margin: 10px 0;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>My Location & IP Address</h1>
-
-        <!-- IP Info Section -->
         <div id="ip-info">
             <h2>Your IP Details</h2>
             <p><strong>IP Address:</strong> <span id="ip-address">Loading...</span></p>
             <p><strong>Location:</strong> <span id="ip-location">Loading...</span></p>
-            <p><strong>Region:</strong> <span id="ip-region">Loading...</span></p>
-            <p><strong>City:</strong> <span id="ip-city">Loading...</span></p>
-            <p><strong>Postal Code:</strong> <span id="ip-postal">Loading...</span></p>
-            <p><strong>Timezone:</strong> <span id="ip-timezone">Loading...</span></p>
-            <p><strong>Longitude:</strong> <span id="ip-longitude">Loading...</span></p>
-            <p><strong>Latitude:</strong> <span id="ip-latitude">Loading...</span></p>
+            <p><strong>Region:</strong> <span id="region">Loading...</span></p>
+            <p><strong>City:</strong> <span id="city">Loading...</span></p>
+            <p><strong>Postal Code:</strong> <span id="postal-code">Loading...</span></p>
+            <p><strong>Timezone:</strong> <span id="timezone">Loading...</span></p>
+            <p><strong>Longitude:</strong> <span id="longitude">Loading...</span></p>
+            <p><strong>Latitude:</strong> <span id="latitude">Loading...</span></p>
         </div>
-
-        <!-- GPS Info Section -->
-        <div id="gps-info">
-            <h2>Your GPS-based Address:</h2>
-            <p id="address">Fetching address...</p>
-        </div>
-
-        <!-- Map Section -->
         <div class="map-container" id="map"></div>
+        <h2>Your GPS-based Address:</h2>
+        <p id="address">Fetching address...</p>
         <p class="tip"><strong>Tip:</strong> Drag the marker to fine-tune your location.</p>
     </div>
 
@@ -87,30 +76,21 @@
         fetch(`https://ipinfo.io?token=${ipInfoToken}`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById('ip-address').innerText = data.ip;
-                document.getElementById('ip-location').innerText = `${data.city}, ${data.region}, ${data.country}`;
-                document.getElementById('ip-region').innerText = data.region || "Not available";
-                document.getElementById('ip-city').innerText = data.city || "Not available";
-                document.getElementById('ip-postal').innerText = data.postal || "Not available";
-                document.getElementById('ip-timezone').innerText = data.timezone || "Not available";
-                document.getElementById('ip-longitude').innerText = data.loc.split(',')[1] || "Not available";
-                document.getElementById('ip-latitude').innerText = data.loc.split(',')[0] || "Not available";
-
-                // Initialize the map with IP coordinates
-                const [lat, lon] = data.loc.split(',');
-                const map = L.map('map').setView([lat, lon], 15);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-                const marker = L.marker([lat, lon], { draggable: true }).addTo(map);
-                fetchAddress(lat, lon);
+                document.getElementById('ip-address').innerText = data.ip || 'N/A';
+                document.getElementById('ip-location').innerText = `${data.city}, ${data.region}, ${data.country}` || 'N/A';
+                document.getElementById('region').innerText = data.region || 'N/A';
+                document.getElementById('city').innerText = data.city || 'N/A';
+                document.getElementById('postal-code').innerText = data.postal || 'N/A';
+                document.getElementById('timezone').innerText = data.timezone || 'N/A';
+                document.getElementById('longitude').innerText = data.loc.split(',')[0] || 'N/A';
+                document.getElementById('latitude').innerText = data.loc.split(',')[1] || 'N/A';
             })
             .catch(() => {
                 document.getElementById('ip-address').innerText = 'Unable to fetch IP';
                 document.getElementById('ip-location').innerText = 'Unable to fetch location';
             });
 
-        // Fetch GPS-based address
+        // Initialize map and fetch GPS-based location
         function fetchAddress(lat, lon) {
             const apiURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
             fetch(apiURL)
@@ -124,7 +104,6 @@
                 });
         }
 
-        // Get the GPS coordinates of the user
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 const { latitude, longitude } = position.coords;
