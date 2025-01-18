@@ -87,8 +87,8 @@
         fetch(`https://ipinfo.io?token=${ipInfoToken}`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById('ip-address').innerText = data.ip || "Not available";
-                document.getElementById('ip-location').innerText = data.city + ', ' + data.region + ', ' + data.country || "Not available";
+                document.getElementById('ip-address').innerText = data.ip;
+                document.getElementById('ip-location').innerText = `${data.city}, ${data.region}, ${data.country}`;
                 document.getElementById('ip-region').innerText = data.region || "Not available";
                 document.getElementById('ip-city').innerText = data.city || "Not available";
                 document.getElementById('ip-postal').innerText = data.postal || "Not available";
