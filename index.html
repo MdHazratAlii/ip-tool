@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Current Address</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .address-content {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .zip-info h2 {
+            text-align: center;
+        }
+        .map-container {
+            height: 300px;
+        }
+        .tip {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="address-content">
+        <div class="zip-info">
+            <h2>Your current address is:</h2>
+            <span id="address">
+                <strong>Loading...</strong>
+            </span>
+        </div>
+        <div class="map-container" id="map"></div>
+        <p class="tip"><strong>Tip:</strong> Drag the map to fine-tune your location.</p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        function fetchAddress(lat, lon) {
+            const apiURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+            fetch(apiURL)
+                .then(response => response.json())
+                .then(data => {
+                    const address = data.display_name || "Address not found";
+                    document.getElementById('address').innerText = address;
+                })
+                .catch(() => {
+                    document.getElementById('address').innerText = "Unable to fetch address.";
+                });
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const { latitude, longitude } = position.coords;
+                const map = L.map('map').setView([latitude, longitude], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                const marker = L.marker([latitude, longitude], { draggable: true }).addTo(map);
+                fetchAddress(latitude, longitude);
+
+                marker.on('dragend', function () {
+                    const pos = marker.getLatLng();
+                    fetchAddress(pos.lat, pos.lng);
+                });
+            }, () => {
+                document.getElementById('address').innerText = "Geolocation permission denied.";
+            });
+        } else {
+            document.getElementById('address').innerText = "Geolocation is not supported by your browser.";
+        }
+    </script>
+</body>
+</html>
