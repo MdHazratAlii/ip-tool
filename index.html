@@ -3,48 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Current Address</title>
+    <title>My Location and IP Address</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            background-color: #F0F4F8;
+            color: #333;
         }
-        .address-content {
-            max-width: 600px;
+        .container {
+            max-width: 800px;
             margin: 50px auto;
             padding: 20px;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
-        .zip-info h2 {
+        h1, h2 {
             text-align: center;
+            color: #118B50;
+        }
+        #ip-info {
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #E6F7F1;
+            border: 1px solid #5DB996;
+            border-radius: 8px;
         }
         .map-container {
-            height: 300px;
+            height: 350px;
+            border-radius: 10px;
+            margin-bottom: 15px;
         }
         .tip {
             text-align: center;
+            color: #888;
+        }
+        #address {
+            font-weight: bold;
+            color: #555;
         }
     </style>
 </head>
 <body>
-    <div class="address-content">
-        <div class="zip-info">
-            <h2>Your current address is:</h2>
-            <span id="address">
-                <strong>Loading...</strong>
-            </span>
+    <div class="container">
+        <h1>My Location & IP Address</h1>
+        <div id="ip-info">
+            <h2>Your IP Details</h2>
+            <p><strong>IP Address:</strong> <span id="ip-address">Loading...</span></p>
+            <p><strong>Location:</strong> <span id="ip-location">Loading...</span></p>
         </div>
         <div class="map-container" id="map"></div>
-        <p class="tip"><strong>Tip:</strong> Drag the map to fine-tune your location.</p>
+        <h2>Your GPS-based Address:</h2>
+        <p id="address">Fetching address...</p>
+        <p class="tip"><strong>Tip:</strong> Drag the marker to fine-tune your location.</p>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
+        const ipInfoToken = '23bc105cf68e89';
+        
+        // Fetch IP-based location
+        fetch(`https://ipinfo.io?token=${ipInfoToken}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('ip-address').innerText = data.ip;
+                document.getElementById('ip-location').innerText = `${data.city}, ${data.region}, ${data.country}`;
+            })
+            .catch(() => {
+                document.getElementById('ip-address').innerText = 'Unable to fetch IP';
+                document.getElementById('ip-location').innerText = 'Unable to fetch location';
+            });
+
+        // Initialize map and fetch GPS-based location
         function fetchAddress(lat, lon) {
             const apiURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
             fetch(apiURL)
